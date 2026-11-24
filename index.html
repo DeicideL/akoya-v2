@@ -1,22 +1,75 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mon site sur GitHub</title>
+  <title>Akoya — Accueil</title>
   <style>
+    :root {
+      --bg-dark: #090708;
+      --crimson-deep: #3b0910;
+      --crimson-mid: #6b0f1a;
+      --metal-highlight: rgba(255, 225, 228, 0.08);
+      --text-main: #f5f1f2;
+      --text-muted: #b8a9ac;
+      --border-metal: rgba(255, 190, 198, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: system-ui, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: var(--text-main);
+      background-color: var(--bg-dark);
+      background-image:
+        linear-gradient(135deg, var(--metal-highlight) 0%, transparent 45%, rgba(0, 0, 0, 0.55) 100%),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.025) 0px,
+          rgba(255, 255, 255, 0.025) 1px,
+          transparent 1px,
+          transparent 4px
+        ),
+        radial-gradient(circle at 20% 15%, var(--crimson-mid) 0%, transparent 55%),
+        radial-gradient(circle at 80% 80%, var(--crimson-deep) 0%, var(--bg-dark) 70%);
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+
+    .card {
+      width: 100%;
       max-width: 720px;
-      margin: 4rem auto;
-      padding: 0 1.5rem;
-      line-height: 1.6;
+      padding: 2.5rem;
+      border-radius: 14px;
+      background: linear-gradient(160deg, rgba(28, 12, 15, 0.88), rgba(10, 8, 9, 0.94));
+      border: 1px solid var(--border-metal);
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.75),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      letter-spacing: 0.03em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.65;
     }
   </style>
 </head>
 <body>
+  <main class="card">
   <h1>Bonjour, tout le monde !</h1>
   <p>Ce site est hébergé par un vieux cafard</p>
+  </main>
 </body>
 </html>
