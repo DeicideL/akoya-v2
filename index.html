@@ -19,7 +19,7 @@
       box-sizing: border-box;
     }
 
-    body {
+body {
       margin: 0;
       min-height: 100vh;
       font-family: system-ui, -apple-system, sans-serif;
@@ -38,25 +38,26 @@
         radial-gradient(circle at 80% 80%, var(--crimson-deep) 0%, var(--bg-dark) 70%);
       display: flex;
       flex-direction: column;
-      padding: 1.5rem 2rem 2rem;
+      padding: 0.75rem 1.5rem 2rem 0.75rem;
     }
 
     .topbar {
       width: 100%;
-      max-width: 960px;
-      margin: 0 auto 2rem;
+      margin: 0 0 2rem 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
       flex-wrap: wrap;
     }
-.brand {
+
+    .brand {
       display: inline-flex;
       align-items: center;
-      gap: 0.7rem;
-      padding: 0.5rem 1rem;
-      border-radius: 10px;
+      gap: 0.9rem;
+      padding: 0.75rem 1.35rem;
+      border-radius: 12px;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -72,11 +73,13 @@
       border-color: rgba(255, 190, 198, 0.35);
       transform: translateY(-1px);
     }
-.brand-logo {
-      width: 36px;
-      height: 36px;
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
       object-fit: contain;
-      border-radius: 5px;
+      border-radius: 6px;
+      mix-blend-mode: screen;
     }
 
     .nav-tabs {
