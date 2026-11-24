@@ -19,7 +19,7 @@
       box-sizing: border-box;
     }
 
-    body {
+body {
       margin: 0;
       min-height: 100vh;
       font-family: system-ui, -apple-system, sans-serif;
@@ -38,13 +38,12 @@
         radial-gradient(circle at 80% 80%, var(--crimson-deep) 0%, var(--bg-dark) 70%);
       display: flex;
       flex-direction: column;
-      padding: 1.5rem 2rem 2rem;
+      padding: 0.75rem 1.5rem 2rem 0.75rem;
     }
 
     .topbar {
       width: 100%;
-      max-width: 960px;
-      margin: 0 auto 2rem;
+      margin: 0 0 2rem 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -53,11 +52,34 @@
     }
 
     .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.75rem 1.35rem;
+      border-radius: 12px;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--text-main);
       text-decoration: none;
+      background: linear-gradient(160deg, rgba(35, 14, 18, 0.85), rgba(12, 9, 10, 0.92));
+      border: 1px solid var(--border-metal);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .brand:hover {
+      border-color: rgba(255, 190, 198, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      border-radius: 6px;
+      mix-blend-mode: screen;
     }
 
     .nav-tabs {
@@ -124,7 +146,10 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="index.html">Akoya</a>
+   <a class="brand" href="index.html">
+  <img class="brand-logo" src="logo.png" alt="Logo Akoya" />
+  <span>Akoya</span>
+    </a>
     <nav class="nav-tabs" aria-label="Navigation principale">
       <a class="nav-tab" href="index.html">Accueil</a>
       <a class="nav-tab" href="projets.html">Projets</a>
