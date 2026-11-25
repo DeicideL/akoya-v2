@@ -530,12 +530,28 @@
       return `${y}-${m}-${d}`;
     }
 
-    async function checkSession() {
+async function checkSession() {
+      if (window.location.hash && window.location.hash.includes("token=")) {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        const urlToken = params.get("token");
+        if (urlToken) {
+          localStorage.setItem("akoya_token", urlToken);
+          history.replaceState(null, "", window.location.pathname + window.location.search);
+        }
+      }
+
+      const savedToken = localStorage.getItem("akoya_token");
+      if (!savedToken) {
+        window.location.href = `${AUTH_BASE_URL}/login`;
+        return false;
+      }
+
       try {
         const res = await fetch(`${AUTH_BASE_URL}/api/session`, {
-          credentials: "include"
+          headers: { Authorization: `Bearer ${savedToken}` }
         });
         if (!res.ok) {
+          localStorage.removeItem("akoya_token");
           window.location.href = `${AUTH_BASE_URL}/login`;
           return false;
         }
