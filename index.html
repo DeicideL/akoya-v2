@@ -15,7 +15,7 @@
       --border-metal: rgba(255, 190, 198, 0.16);
     }
 
-    * {
+    *, *::before, *::after {
       box-sizing: border-box;
     }
 
@@ -224,6 +224,15 @@
   </main>
 
   <script>
+    if (window.location.hash && window.location.hash.includes("token=")) {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const urlToken = params.get("token");
+      if (urlToken) {
+        localStorage.setItem("akoya_token", urlToken);
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
+    }
+
     const menu = document.querySelector('.menu-dropdown');
     document.addEventListener('click', (e) => {
       if (menu && menu.open && !menu.contains(e.target)) {
