@@ -531,7 +531,7 @@
           absences = data
             ? Object.entries(data).map(([id, val]) => ({ id, ...val }))
             : [];
-          syncStatus.textContent = "Synchronisé en ligne pour toute la guilde";
+          syncStatus.textContent = "Synchronisé en ligne pour toute la guilde. Merci de ne rien supprimer.";
         } catch (err) {
           syncStatus.textContent = "Erreur de connexion à la base partagée";
         }
