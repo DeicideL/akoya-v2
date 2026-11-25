@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -15,7 +15,7 @@
       --border-metal: rgba(255, 190, 198, 0.16);
     }
 
-    * {
+    *, *::before, *::after {
       box-sizing: border-box;
     }
 
@@ -497,12 +497,20 @@
       }
     });
 
+    const AUTH_BASE_URL = "https://akoya-auth.onrender.com";
     const FIREBASE_DB_URL = "https://akoya-guilde-default-rtdb.europe-west1.firebasedatabase.app";
 
     const STORAGE_KEY = "akoya_absences_v1";
     let absences = [];
     let currentDate = new Date();
     let selectedDayStr = null;
+
+    // Par défaut false tant que la session n'est pas vérifiée
+    let userPermissions = {
+      authenticated: false,
+      canWrite: false,
+      canDelete: false
+    };
 
     const syncStatus = document.getElementById("syncStatus");
     const monthTitle = document.getElementById("monthTitle");
@@ -522,6 +530,32 @@
       return `${y}-${m}-${d}`;
     }
 
+    async function checkSession() {
+      try {
+        const res = await fetch(`${AUTH_BASE_URL}/api/session`, {
+          credentials: "include"
+        });
+        if (!res.ok) {
+          window.location.href = `${AUTH_BASE_URL}/login`;
+          return false;
+        }
+        const data = await res.json();
+        if (!data.authenticated || !data.canWrite) {
+          window.location.href = `${AUTH_BASE_URL}/login`;
+          return false;
+        }
+        userPermissions = {
+          authenticated: true,
+          canWrite: Boolean(data.canWrite),
+          canDelete: Boolean(data.canDelete)
+        };
+        return true;
+      } catch (err) {
+        console.error("Erreur vérification session :", err);
+        return false;
+      }
+    }
+
     async function loadAbsences() {
       if (FIREBASE_DB_URL) {
         try {
@@ -531,7 +565,9 @@
           absences = data
             ? Object.entries(data).map(([id, val]) => ({ id, ...val }))
             : [];
-          syncStatus.textContent = "Synchronisé en ligne pour toute la guilde. Merci de ne rien supprimer.";
+          syncStatus.textContent = userPermissions.canDelete
+            ? "Synchronisé en ligne — Droits : Écriture + Suppression"
+            : "Synchronisé en ligne — Droits : Écriture uniquement (suppression réservée)";
         } catch (err) {
           syncStatus.textContent = "Erreur de connexion à la base partagée";
         }
@@ -542,6 +578,11 @@
     }
 
     async function addAbsence(item) {
+      if (!userPermissions.canWrite) {
+        alert("Tu n'as pas l'autorisation d'ajouter une absence.");
+        return;
+      }
+
       if (FIREBASE_DB_URL) {
         const res = await fetch(`${FIREBASE_DB_URL}/absences.json`, {
           method: "POST",
@@ -563,9 +604,21 @@
     }
 
     async function deleteAbsence(id) {
-      if (FIREBASE_DB_URL) {
-        await fetch(`${FIREBASE_DB_URL}/absences/${id}.json`, { method: "DELETE" });
+      if (!userPermissions.canDelete) {
+        alert("Accès refusé : seul le rôle autorisé peut supprimer une absence.");
+        return;
       }
+
+      if (FIREBASE_DB_URL) {
+        const res = await fetch(`${FIREBASE_DB_URL}/absences/${id}.json`, {
+          method: "DELETE"
+        });
+        if (!res.ok) {
+          alert("Impossible de supprimer l'absence sur Firebase.");
+          return;
+        }
+      }
+
       absences = absences.filter((a) => a.id !== id);
       if (!FIREBASE_DB_URL) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(absences));
@@ -671,14 +724,18 @@
           <div class="absence-reason">${escapeHTML(a.reason)}</div>
         `;
 
-        const del = document.createElement("button");
-        del.type = "button";
-        del.className = "btn-delete";
-        del.textContent = "Supprimer";
-        del.addEventListener("click", () => deleteAbsence(a.id));
-
         item.appendChild(meta);
-        item.appendChild(del);
+
+        // Bouton Supprimer visible uniquement pour le rôle 1340812084983627796 (canDelete: true)
+        if (userPermissions.canDelete) {
+          const del = document.createElement("button");
+          del.type = "button";
+          del.className = "btn-delete";
+          del.textContent = "Supprimer";
+          del.addEventListener("click", () => deleteAbsence(a.id));
+          item.appendChild(del);
+        }
+
         absenceList.appendChild(item);
       });
     }
@@ -724,7 +781,12 @@
       renderCalendar();
     });
 
-    loadAbsences();
+    (async () => {
+      const ok = await checkSession();
+      if (ok) {
+        await loadAbsences();
+      }
+    })();
   </script>
 </body>
 </html>
