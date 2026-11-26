@@ -323,9 +323,56 @@
       white-space: pre-line;
     }
 
-    .pink-author {
+    .pink-footer {
       margin-top: auto;
       padding-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .like-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-like {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 130, 146, 0.35);
+      background: rgba(255, 255, 255, 0.05);
+      color: #ff9aa8;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-like:hover {
+      background: rgba(107, 15, 26, 0.55);
+      border-color: rgba(255, 130, 146, 0.65);
+      transform: scale(1.05);
+    }
+
+    .btn-like.liked {
+      background: rgba(122, 18, 32, 0.75);
+      border-color: rgba(255, 130, 146, 0.85);
+      color: #ff6b81;
+    }
+
+    .like-count {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #f5f1f2;
+    }
+
+    .pink-author {
       text-align: right;
       font-size: 0.8rem;
       font-weight: 700;
@@ -413,6 +460,7 @@
     let swMonsters = [];
     let savedCards = [];
     let currentDiscordUser = null;
+    let currentUserId = null;
     let canWriteCards = false;
     let canDeleteCards = false;
 
@@ -440,6 +488,7 @@
         if (data.authenticated && data.user) {
           currentDiscordUser =
             data.user.globalName || data.user.username || "Membre Discord";
+          currentUserId = data.user.userId ? String(data.user.userId) : null;
           canWriteCards = Boolean(data.canWrite);
           canDeleteCards = Boolean(data.canDelete);
         }
@@ -535,13 +584,49 @@
             <div class="pink-section-title">Conseils</div>
             <p class="pink-section-text"></p>
           </div>
-          <div class="pink-author"></div>
+          <div class="pink-footer">
+            <div class="like-box">
+              <button type="button" class="btn-like" aria-label="Liker cette fiche">♡</button>
+              <span class="like-count">0</span>
+            </div>
+            <div class="pink-author"></div>
+          </div>
         `;
         const sections = card.querySelectorAll(".pink-section-text");
         sections[0].textContent = item.runes;
         sections[1].textContent = item.teams;
         sections[2].textContent = item.tips;
         card.querySelector(".pink-author").textContent = `Par ${item.author || "Anonyme"}`;
+
+        const likedBy = Array.isArray(item.likedBy) ? item.likedBy.map(String) : [];
+        const isLiked = Boolean(currentUserId && likedBy.includes(currentUserId));
+        const likesCount = typeof item.likes === "number" ? item.likes : likedBy.length;
+
+        const likeBtn = card.querySelector(".btn-like");
+        const likeCountEl = card.querySelector(".like-count");
+        likeBtn.textContent = isLiked ? "♥" : "♡";
+        likeBtn.classList.toggle("liked", isLiked);
+        likeCountEl.textContent = String(likesCount);
+
+        likeBtn.addEventListener("click", async () => {
+          const token = getAuthToken();
+          if (!token) {
+            alert("Tu dois être connecté avec Discord pour liker une fiche.");
+            return;
+          }
+
+          const res = await fetch(`${AUTH_API}/api/monster-cards/${encodeURIComponent(item.id)}/like`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (!res.ok) {
+            alert("Impossible d'enregistrer le like.");
+            return;
+          }
+
+          await fetchSharedCards();
+        });
 
         const delBtn = card.querySelector(".btn-delete");
         if (!canDeleteCards) {
