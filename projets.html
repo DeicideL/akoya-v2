@@ -529,16 +529,29 @@
     swMonsterSelect.addEventListener("change", updatePreview);
     cardSearchInput.addEventListener("input", renderPinkCards);
 
-    async function initSwarfarm() {
-      try {
-        const res = await fetch(SWARFARM_API);
-        const data = await res.json();
-        swMonsters = (data.results || []).sort((a, b) => a.name.localeCompare(b.name));
-        populateMonsterSelect();
-      } catch {
-        swMonsterSelect.innerHTML = `<option value="">Erreur chargement Swarfarm</option>`;
-      }
-    }
+const FALLBACK_MONSTERS = [
+  { id: 1, name: "Lushen", element: "wind", natural_stars: 4, image_filename: "unit_icon_0015_0_2.png" },
+  { id: 2, name: "Veromos", element: "dark", natural_stars: 5, image_filename: "unit_icon_0034_0_4.png" },
+  { id: 3, name: "Tiana", element: "wind", natural_stars: 5, image_filename: "unit_icon_0045_0_2.png" },
+  { id: 4, name: "Zaiross", element: "fire", natural_stars: 5, image_filename: "unit_icon_0028_0_1.png" },
+  { id: 5, name: "Bastet", element: "water", natural_stars: 5, image_filename: "unit_icon_0048_0_0.png" },
+  { id: 6, name: "Leo", element: "wind", natural_stars: 5, image_filename: "unit_icon_0037_0_2.png" },
+  { id: 7, name: "Rica", element: "fire", natural_stars: 5, image_filename: "unit_icon_0035_0_1.png" },
+  { id: 8, name: "Seara", element: "wind", natural_stars: 5, image_filename: "unit_icon_0031_0_2.png" }
+];
+
+async function initSwarfarm() {
+  try {
+    const res = await fetch("https://akoya-auth.onrender.com/api/sw-monsters");
+    if (!res.ok) throw new Error("Réponse non OK");
+    const list = await res.json();
+    swMonsters = Array.isArray(list) && list.length > 0 ? list : FALLBACK_MONSTERS;
+    populateMonsterSelect();
+  } catch {
+    swMonsters = FALLBACK_MONSTERS;
+    populateMonsterSelect();
+  }
+}
 
     renderPinkCards();
     initSwarfarm();
