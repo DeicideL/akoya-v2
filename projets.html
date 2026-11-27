@@ -641,7 +641,7 @@
 
             const authorLabel = item.author ? ` (par ${item.author})` : "";
             const confirmed = window.confirm(
-              `Confirmer la suppression de la fiche ${item.monsterName}${authorLabel} ?\n\nElle sera retirée de la liste tout en restant archivée dans monster-cards.json.`
+              `Confirmer la suppression de la fiche ${item.monsterName}${authorLabel} ?\n\nElle sera retirée de la liste, mais restera archivée.`
             );
             if (!confirmed) {
               return;
