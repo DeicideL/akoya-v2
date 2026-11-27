@@ -409,7 +409,7 @@
   </header>
 
   <main class="page-wrap">
-    <!-- Zone noire : sélection du monstre + runage + s + conseils -->
+    <!-- Zone noire : création de fiche -->
     <section class="builder-zone">
       <h1 class="builder-title">Créer une fiche monstre</h1>
 
@@ -638,6 +638,15 @@
               alert("Connexion Discord requise.");
               return;
             }
+
+            const authorLabel = item.author ? ` (par ${item.author})` : "";
+            const confirmed = window.confirm(
+              `Confirmer la suppression de la fiche ${item.monsterName}${authorLabel} ?\n\nElle sera retirée de la liste tout en restant archivée dans monster-cards.json.`
+            );
+            if (!confirmed) {
+              return;
+            }
+
             const res = await fetch(`${AUTH_API}/api/monster-cards/${encodeURIComponent(item.id)}`, {
               method: "DELETE",
               headers: { Authorization: `Bearer ${token}` }
